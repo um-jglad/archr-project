@@ -1,12 +1,12 @@
 
 services:
-  rstudio:
+  ArchRStudio:
     build:
       context: .
       platforms: ["linux/amd64"]
-      tags: ["rocker:rstudio-4.1"]
-    image: rocker:rstudio-4.1
-    container_name: rstudio-4.1
+      tags: ["rocker:ArchRStudio"]
+    image: rocker:ArchRStudio
+    container_name: ArchRStudio
     ports:
       - "0.0.0.0:8787:8787"
     environment:
