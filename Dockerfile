@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     libbz2-dev \
     libgsl-dev \
     liblzma-dev \
+    libcairo2 \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -28,6 +29,8 @@ RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/vctrs
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/lifecycle/lifecycle_1.0.2.tar.gz', repos = NULL, type = 'source')"
 RUN R -e "install.packages('https://cran.r-project.org/src/contrib/Archive/ggplot2/ggplot2_3.4.2.tar.gz', repos = NULL, type = 'source')"
 RUN R -e "devtools::install_github('GreenleafLab/ArchR', ref='master', repos = BiocManager::repositories())"
+RUN R -e "install.packages('Cairo')"
+
 
 # Install ggplot2 version 3.4.2
 #RUN R -e "install.packages('remotes'); \
