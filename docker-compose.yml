@@ -1,6 +1,7 @@
 
 services:
   ArchRStudio:
+    # Rebuild with docker compose up -d --build
     build:
       context: .
       platforms: ["linux/amd64"]
@@ -11,3 +12,6 @@ services:
       - "0.0.0.0:8787:8787"
     environment:
       DISABLE_AUTH: true
+    volumes:
+      # Uncomment below to map a local directory to the container, update accordingly
+      #- ~/local/project/dir:/home/rstudio/project_name
