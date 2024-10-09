@@ -6,6 +6,6 @@
 
 2. Open terminal application and run:
 
-Docker-compose up --build
+Docker-compose up -d --build
 
-3. Open OrbStack, click the name of the desired container, click the blue "8787" to open web browser on the port.
+3. Open OrbStack, click the name of the desired container, click the link :link: or domain name to open the RStudio app in your default system browser.
