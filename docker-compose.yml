@@ -12,6 +12,6 @@ services:
       - "0.0.0.0:8787:8787"
     environment:
       DISABLE_AUTH: true
-    volumes:
-      # Uncomment below to map a local directory to the container, update accordingly
+    # Uncomment all below to map a local directory to the container, update accordingly
+    # volumes:
       #- ~/local/project/dir:/home/rstudio/project_name
