@@ -3,7 +3,8 @@ FROM rocker/rstudio:4.1
 
 # Environment Settings for parallel compiling
 RUN echo 'export MAKEFLAGS="-j$(($(nproc) - 1))"' >> /etc/profile.d/makeflags.sh
-COPY ./files/ /home/rstudio/
+COPY ./files/.Rprofile /usr/local/lib/R/etc/Rprofile.site \
+    && ./files/ArchR_Tutorial /home/rstudio/
 
 # Install system dependencies required by ArchR and Bioconductor packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
