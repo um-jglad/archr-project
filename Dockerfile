@@ -1,6 +1,10 @@
 # Use rocker/rstudio with R 4.1.0 for ARM compatibility
 FROM rocker/rstudio:4.1
 
+# Environment Settings for parallel compiling
+RUN echo 'export MAKEFLAGS="-j$(($(nproc) - 1))"' >> /etc/profile.d/makeflags.sh
+COPY ./files/ /home/rstudio/
+
 # Install system dependencies required by ArchR and Bioconductor packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-openssl-dev \
@@ -22,10 +26,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN R -q -e 'install.packages(c("devtools", "BiocManager", "Seurat", "Cairo", "hexbin"))' \
     && R -q -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())' \
     && R -q -e 'BiocManager::install("BiocVersion")'
-
-# Environment Settings for parallel compiling
-RUN echo 'export MAKEFLAGS="-j$(($(nproc) - 1))"' >> /home/rstudio/.bashrc
-COPY ./files/ /home/rstudio/
 
 # Cleanup
 RUN rm -rf /tmp/* \
