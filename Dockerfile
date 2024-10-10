@@ -2,9 +2,16 @@
 FROM rocker/rstudio:4.1
 
 # Environment Settings for parallel compiling
-RUN echo 'export MAKEFLAGS="-j$(($(nproc) - 1))"' >> /etc/profile.d/makeflags.sh
-COPY ./files/.Rprofile /usr/local/lib/R/etc/Rprofile.site \
-    && ./files/ArchR_Tutorial /home/rstudio/
+COPY ./files/ /home/rstudio/
+RUN echo 'export MAKEFLAGS="-j$(($(nproc) - 1))"' >> /etc/profile.d/makeflags.sh \
+    && cat <<EOT >> /usr/local/lib/R/etc/Rprofile.site
+# Set the R mirror to UMich
+local({r <- getOption("repos")
+r["CRAN"] <- "https://repo.miserver.it.umich.edu/cran"
+options(repos=r)})
+
+options(Ncpus = as.integer(system("/usr/bin/nproc", intern = TRUE)) - 1)
+EOT
 
 # Install system dependencies required by ArchR and Bioconductor packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
