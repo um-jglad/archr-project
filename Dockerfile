@@ -1,17 +1,5 @@
 # Use rocker/rstudio with R 4.1.0 for ARM compatibility
-FROM rocker/rstudio:4.1
-
-# Environment Settings for parallel compiling
-COPY ./files/ /home/rstudio/
-RUN echo 'export MAKEFLAGS="-j$(($(nproc) - 1))"' >> /etc/profile.d/makeflags.sh \
-    && cat <<EOT >> /usr/local/lib/R/etc/Rprofile.site
-# Set the R mirror to UMich
-local({r <- getOption("repos")
-r["CRAN"] <- "https://repo.miserver.it.umich.edu/cran"
-options(repos=r)})
-
-options(Ncpus = as.integer(system("/usr/bin/nproc", intern = TRUE)) - 1)
-EOT
+FROM rocker/rstudio:4.1 AS stage1
 
 # Install system dependencies required by ArchR and Bioconductor packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -28,8 +16,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xvfb \
     xauth \
     xfonts-base \
-    libglpk-dev 
+    libglpk-dev \
+    && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/*
 
+FROM stage1 as stage2
 # Install R packages and dependencies
 RUN R -q -e 'install.packages(c("devtools", "BiocManager", "Seurat", "Cairo", "hexbin"))' \
     && R -q -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())' \
@@ -37,4 +29,12 @@ RUN R -q -e 'install.packages(c("devtools", "BiocManager", "Seurat", "Cairo", "h
 
 # Cleanup
 RUN rm -rf /tmp/* \
-    && rm -rf /var/lib/apt/lists/*
+    /var/lib/apt/lists/*
+
+FROM stage1
+COPY --from=stage2 /usr/local/lib/R/site-library /usr/local/lib/R/site-library
+
+# Environment Settings for parallel compiling
+COPY ./files/ /home/rstudio/
+RUN echo 'export MAKEFLAGS="-j$(($(nproc) - 1))"' >> /etc/profile.d/makeflags.sh \
+    && cat /home/rstudio/.Rprofile >> /usr/local/lib/R/etc/Rprofile.site

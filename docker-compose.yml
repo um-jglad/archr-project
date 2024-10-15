@@ -1,4 +1,3 @@
-
 services:
   ArchRStudio:
     # Rebuild with docker compose up -d --build
